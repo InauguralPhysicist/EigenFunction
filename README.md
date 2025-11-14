@@ -526,7 +526,9 @@ If you use this work in research, please cite:
 ## Contact
 
 - **Author**: InauguralPhysicist
-- **Email**: jon92087@yahoo.com
+- **Email**: InauguralPhysicist@gmail.com
+- **X**: [@InauguralPhys](https://x.com/InauguralPhys)
+- **Medium**: [https://inauguralphysicist.medium.com/](https://inauguralphysicist.medium.com/)
 - **Related Work**: [eigenai.org](https://eigenai.org)
 
 ## Acknowledgments
