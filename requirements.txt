@@ -1,2 +1,7 @@
 numpy>=1.20.0
 pytest>=7.0.0
+
+# GPU acceleration (optional - install based on your CUDA version)
+# For CUDA 11.x: pip install cupy-cuda11x
+# For CUDA 12.x: pip install cupy-cuda12x
+# The gpu_similarity module will work without CuPy, falling back to CPU
