@@ -183,6 +183,16 @@ def create_statement_embedding(
         # Completely independent tokens
         x = torch.randn(batch_size, seq_len, dim)
 
+    elif statement_type == "asymmetric_equality":
+        # "a = b, but b ≠ a" (contradiction - equality is symmetric)
+        # Token 0: a, Token 1: =, Token 2: b
+        # Token 3: b, Token 4: ≠, Token 5: a
+        x[:, 1, :] = 0.8 * (x[:, 0, :] + x[:, 2, :]) / 2  # = relation
+        x[:, 4, :] = -0.8 * (x[:, 3, :] + x[:, 5, :]) / 2  # ≠ relation (negated)
+        # Create contradiction: same entities, opposite relations
+        x[:, 5, :] = 0.9 * x[:, 0, :]  # a appears twice
+        x[:, 3, :] = 0.9 * x[:, 2, :]  # b appears twice
+
     else:
         raise ValueError(f"Unknown statement type: {statement_type}")
 
@@ -204,6 +214,7 @@ def test_paradox_detection():
         ("liar_paradox", LogicType.PARADOX, "This statement is false"),
         ("russell_paradox", LogicType.PARADOX, "Set that contains itself iff it doesn't"),
         ("yesno_paradox", LogicType.PARADOX, "Is the answer to this question 'no'?"),
+        ("asymmetric_equality", LogicType.PARADOX, "a = b, but b ≠ a"),
         ("valid_statement", LogicType.VALID, "2 + 2 = 4"),
         ("simple_statement", LogicType.VALID, "Cats are mammals"),
     ]
@@ -216,8 +227,9 @@ def test_paradox_detection():
         print(f"Type: {statement_type}")
         print(f"Expected: {expected_type.value}")
 
-        # Create embedding
-        x = create_statement_embedding(statement_type, dim=dim)
+        # Create embedding (use more tokens for asymmetric equality)
+        seq_len = 6 if statement_type == "asymmetric_equality" else 4
+        x = create_statement_embedding(statement_type, seq_len=seq_len, dim=dim)
 
         # Detect
         detected_type, diagnostics = detector(x, max_iterations=5)
