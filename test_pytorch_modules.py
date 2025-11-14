@@ -10,13 +10,13 @@ import pytest
 import torch
 import torch.nn as nn
 
+from eigen_attention import EigenAttention
+from eigen_memory import EigenMemory
 from gpu_similarity import (
+    compare_self_similarity_torch,
     eigen_similarity,
     standard_cosine_similarity_torch,
-    compare_self_similarity_torch,
 )
-from eigen_memory import EigenMemory
-from eigen_attention import EigenAttention
 
 
 class TestGPUSimilarity:
@@ -422,6 +422,7 @@ class TestIntegration:
         """Test that PyTorch version is consistent with NumPy version."""
         # Import NumPy version
         import numpy as np
+
         from similarity import lorentz_similarity
 
         # Create same vector in both frameworks

@@ -35,8 +35,9 @@ This lightlike (null) self-product yields undefined or 0.0 similarity,
 preventing self-reinforcing loops.
 """
 
+from typing import Optional, Union
+
 import numpy as np
-from typing import Union, Optional
 
 
 def lorentz_similarity(u: np.ndarray, v: np.ndarray, epsilon: float = 1e-10) -> float:
