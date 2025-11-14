@@ -60,7 +60,9 @@ class SelfReferenceTask(BenchmarkTask):
         return {
             "iterations": diagnostics.get("iterations", 0),
             "looped": diagnostics.get("looped", False),
-            "final_value": diagnostics.get("final_imbalance", diagnostics.get("final_similarity", 0)),
+            "final_value": diagnostics.get(
+                "final_imbalance", diagnostics.get("final_similarity", 0)
+            ),
         }
 
 
@@ -95,7 +97,9 @@ class CircularDependencyTask(BenchmarkTask):
         return {
             "iterations": diagnostics.get("iterations", 0),
             "looped": diagnostics.get("looped", False),
-            "final_value": diagnostics.get("final_imbalance", diagnostics.get("final_similarity", 0)),
+            "final_value": diagnostics.get(
+                "final_imbalance", diagnostics.get("final_similarity", 0)
+            ),
         }
 
 
@@ -130,7 +134,9 @@ class RecursivePlanningTask(BenchmarkTask):
         return {
             "iterations": diagnostics.get("iterations", 0),
             "looped": diagnostics.get("looped", False),
-            "final_value": diagnostics.get("final_imbalance", diagnostics.get("final_similarity", 0)),
+            "final_value": diagnostics.get(
+                "final_imbalance", diagnostics.get("final_similarity", 0)
+            ),
         }
 
 
@@ -161,7 +167,9 @@ class FixedPointTask(BenchmarkTask):
         return {
             "iterations": diagnostics.get("iterations", 0),
             "looped": diagnostics.get("looped", False),
-            "final_value": diagnostics.get("final_imbalance", diagnostics.get("final_similarity", 0)),
+            "final_value": diagnostics.get(
+                "final_imbalance", diagnostics.get("final_similarity", 0)
+            ),
         }
 
 
@@ -310,9 +318,7 @@ def run_benchmarks():
 
     # Create models
     standard = StandardReasoningModel(dim=dim, num_heads=num_heads)
-    spacetime = SpacetimeReasoningModel(
-        dim=dim, num_heads=num_heads, feedback_strength=0.5
-    )
+    spacetime = SpacetimeReasoningModel(dim=dim, num_heads=num_heads, feedback_strength=0.5)
 
     models = [
         ("Standard", standard),

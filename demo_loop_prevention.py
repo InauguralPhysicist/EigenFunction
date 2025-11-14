@@ -26,14 +26,10 @@ class StandardReasoningModel(nn.Module):
     def __init__(self, dim: int = 64, num_heads: int = 4, num_layers: int = 2):
         super().__init__()
         self.dim = dim
-        self.layers = nn.ModuleList([
-            StandardAttention(dim, num_heads) for _ in range(num_layers)
-        ])
+        self.layers = nn.ModuleList([StandardAttention(dim, num_heads) for _ in range(num_layers)])
         self.output_head = nn.Linear(dim, dim)
 
-    def forward(
-        self, x: torch.Tensor, max_iterations: int = 10
-    ) -> tuple[torch.Tensor, dict]:
+    def forward(self, x: torch.Tensor, max_iterations: int = 10) -> tuple[torch.Tensor, dict]:
         """
         Run iterative reasoning.
 
@@ -93,12 +89,12 @@ class SpacetimeReasoningModel(nn.Module):
     ):
         super().__init__()
         self.dim = dim
-        self.layers = nn.ModuleList([
-            SpacetimeFeedbackBlock(
-                dim, num_heads, feedback_strength=feedback_strength
-            )
-            for _ in range(num_layers)
-        ])
+        self.layers = nn.ModuleList(
+            [
+                SpacetimeFeedbackBlock(dim, num_heads, feedback_strength=feedback_strength)
+                for _ in range(num_layers)
+            ]
+        )
         self.output_head = nn.Linear(dim, dim)
 
     def forward(
@@ -231,9 +227,7 @@ def demo_loop_prevention():
     print("Test 2: Spacetime Feedback (EigenFunction)")
     print("=" * 70)
 
-    spacetime_model = SpacetimeReasoningModel(
-        dim, num_heads, feedback_strength=0.5
-    )
+    spacetime_model = SpacetimeReasoningModel(dim, num_heads, feedback_strength=0.5)
     spacetime_output, spacetime_diagnostics = spacetime_model(x, max_iterations)
 
     print(f"\nResult:")
@@ -250,7 +244,9 @@ def demo_loop_prevention():
     print(f"\n  Spacetime Interval (ds²) Evolution:")
     intervals = spacetime_diagnostics["intervals"]
     for i, interval in enumerate(intervals[:10]):  # Show first 10
-        interpretation = "TIMELIKE" if interval < -0.1 else "SPACELIKE" if interval > 0.1 else "LIGHTLIKE"
+        interpretation = (
+            "TIMELIKE" if interval < -0.1 else "SPACELIKE" if interval > 0.1 else "LIGHTLIKE"
+        )
         print(f"    Step {i}: ds² = {interval:+.4f} ({interpretation})")
 
     # Comparison

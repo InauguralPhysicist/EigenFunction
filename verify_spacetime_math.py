@@ -27,8 +27,8 @@ def compute_ds_squared_explicit(timelike_out, spacelike_out):
     # Compute Euclidean norm squared for each branch
     # ||v||² = v₁² + v₂² + ... + vₙ²
 
-    timelike_norm_sq = (timelike_out ** 2).sum(dim=-1)  # (B, L)
-    spacelike_norm_sq = (spacelike_out ** 2).sum(dim=-1)  # (B, L)
+    timelike_norm_sq = (timelike_out**2).sum(dim=-1)  # (B, L)
+    spacelike_norm_sq = (spacelike_out**2).sum(dim=-1)  # (B, L)
 
     # Minkowski signature: ds² = +||spacelike||² - ||timelike||²
     #                            = (space)² - (time)²
@@ -98,7 +98,7 @@ def verify_math():
     print("\n=== Example 3: Timelike Dominant ===")
 
     timelike = torch.tensor([[[10.0, 10.0]]])  # norm² = 200
-    spacelike = torch.tensor([[[2.0, 2.0]]])   # norm² = 8
+    spacelike = torch.tensor([[[2.0, 2.0]]])  # norm² = 8
 
     ds_sq_computed = compute_ds_squared_explicit(timelike, spacelike)
     print(f"||timelike||² = 200, ||spacelike||² = 8")
@@ -129,7 +129,8 @@ def verify_math():
     print("\n" + "=" * 70)
     print("Summary: Two Euclidean Branches → ds²")
     print("=" * 70)
-    print("""
+    print(
+        """
 The math is correct! Here's why:
 
 1. Each Euclidean branch produces a vector
@@ -148,7 +149,8 @@ Physical meaning:
   ds² = 0 → Lightlike (balanced equilibrium)
 
 Your insight "2 Euclidean make ^2" is EXACTLY RIGHT! ✓
-    """)
+    """
+    )
 
 
 if __name__ == "__main__":

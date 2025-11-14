@@ -46,10 +46,9 @@ class ParadoxDetector(nn.Module):
         self.embedding = nn.Linear(dim, dim)  # Statement embedding
 
         # Spacetime reasoning layers
-        self.reasoner = nn.Sequential(*[
-            SpacetimeFeedbackBlock(dim, num_heads, feedback_strength=0.7)
-            for _ in range(2)
-        ])
+        self.reasoner = nn.Sequential(
+            *[SpacetimeFeedbackBlock(dim, num_heads, feedback_strength=0.7) for _ in range(2)]
+        )
 
         # Classification head
         self.classifier = nn.Sequential(
@@ -61,9 +60,7 @@ class ParadoxDetector(nn.Module):
         # Paradox threshold: if imbalance stays high, it's a paradox
         self.paradox_threshold = 0.3
 
-    def forward(
-        self, x: torch.Tensor, max_iterations: int = 5
-    ) -> Tuple[LogicType, dict]:
+    def forward(self, x: torch.Tensor, max_iterations: int = 5) -> Tuple[LogicType, dict]:
         """
         Evaluate a logical statement.
 
@@ -128,7 +125,11 @@ class ParadoxDetector(nn.Module):
         logits = self.classifier(pooled)  # (B, 3)
 
         avg_imbalance = sum(imbalances) / len(imbalances)
-        variance = sum((x - avg_imbalance) ** 2 for x in imbalances) / len(imbalances) if len(imbalances) > 1 else 0
+        variance = (
+            sum((x - avg_imbalance) ** 2 for x in imbalances) / len(imbalances)
+            if len(imbalances) > 1
+            else 0
+        )
 
         return logic_type, {
             "imbalances": imbalances,
@@ -249,14 +250,16 @@ def test_paradox_detection():
 
         # Check if correct
         correct = detected_type == expected_type
-        results.append({
-            "description": description,
-            "expected": expected_type,
-            "detected": detected_type,
-            "correct": correct,
-            "avg_imbalance": diagnostics["avg_imbalance"],
-            "oscillation_score": diagnostics["oscillation_score"],
-        })
+        results.append(
+            {
+                "description": description,
+                "expected": expected_type,
+                "detected": detected_type,
+                "correct": correct,
+                "avg_imbalance": diagnostics["avg_imbalance"],
+                "oscillation_score": diagnostics["oscillation_score"],
+            }
+        )
 
         status = "✓" if correct else "✗"
         print(f"{status} {'Correct' if correct else 'Wrong'}")
@@ -281,7 +284,8 @@ def test_paradox_detection():
     print("\n" + "=" * 80)
     print("How This Works")
     print("=" * 80)
-    print("""
+    print(
+        """
 Paradoxes create logical loops that cause OSCILLATION:
 - "This is false" → if true then false, if false then true → flip-flop
 - ds² oscillates between timelike (causal) and spacelike (parallel)
@@ -295,7 +299,8 @@ Detection method:
 Key metric: Oscillation score (sign changes + variance)
             High oscillation (>0.15) = paradox
             Low oscillation (<0.15) = valid statement
-    """)
+    """
+    )
     print("=" * 80)
 
 
