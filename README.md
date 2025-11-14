@@ -151,9 +151,97 @@ This demonstrates loop prevention in:
 4. **Semantic Search** - Encourages query expansion exploration
 5. **Consciousness Modeling** - Implements eigengate measurement disruption
 
+## PyTorch Neural Network Modules
+
+GPU-accelerated PyTorch implementations for deep learning applications.
+
+### EigenAttention
+
+Multi-head attention using Lorentz-invariant similarity instead of dot-product:
+
+```python
+import torch
+from eigen_attention import EigenAttention
+
+# Create attention layer
+attn = EigenAttention(
+    dim=512,
+    num_heads=8,
+    sim_scale=4.0,
+    loop_epsilon=1e-3,  # Self-attention suppression threshold
+    causal=False
+)
+
+# Forward pass
+x = torch.randn(2, 100, 512)  # (batch, seq_len, dim)
+out, attn_weights = attn(x)
+
+# out shape: (2, 100, 512)
+# attn_weights shape: (2, 8, 100, 100)  # (batch, heads, seq, seq)
+```
+
+**Key Parameters:**
+- `loop_epsilon`: Threshold for suppressing near-self similarities (default: 1e-3)
+- `sim_scale`: Scaling factor for similarity logits (default: 4.0)
+- `mask_negative`: Suppress negative (disconnected) similarities (default: True)
+- `causal`: Apply causal masking for autoregressive models (default: False)
+
+### EigenMemory
+
+External memory module with Lorentz-invariant retrieval:
+
+```python
+from eigen_memory import EigenMemory
+
+# Create memory bank
+mem = EigenMemory(
+    dim=256,
+    max_mem_slots=4096,
+    k_top=32,  # Retrieve top-32 neighbors
+    loop_epsilon=1e-3,
+    decay=0.99  # Temporal decay for older entries
+)
+
+# Write to memory
+states = torch.randn(100, 256)
+mem.write(states)
+
+# Retrieve similar memories
+query = torch.randn(10, 256)
+retrieved = mem(query)  # (10, 256)
+
+# Or get attention weights
+retrieved, (attn, indices) = mem(query, return_weights=True)
+```
+
+**Key Features:**
+- Ring-buffer storage with configurable capacity
+- Temporal decay favoring recent entries
+- Top-k retrieval with softmax attention
+- Loop prevention via `loop_epsilon` threshold
+
+### GPU Similarity Functions
+
+Low-level similarity computations:
+
+```python
+from gpu_similarity import eigen_similarity, standard_cosine_similarity_torch
+
+# Batched similarity computation
+q = torch.randn(32, 128)  # 32 queries
+k = torch.randn(1000, 128)  # 1000 keys
+
+eigen_sim = eigen_similarity(q, k)  # (32, 1000), self-sim = 0.0
+cosine_sim = standard_cosine_similarity_torch(q, k)  # (32, 1000), self-sim = 1.0
+```
+
+**Supported Shapes:**
+- 2D: `(B, D) x (N, D) → (B, N)` - Query-key retrieval
+- 3D: `(B, L_q, D) x (B, L_k, D) → (B, L_q, L_k)` - Sequence attention
+
 ## Testing
 
-Run the test suite:
+### NumPy Implementation Tests
 
 ```bash
 pytest test_similarity.py -v
@@ -166,6 +254,20 @@ Tests validate:
 - ✓ High-dimensional performance (up to 500D tested)
 - ✓ Loop prevention via accumulation tests
 - ✓ Input validation and error handling
+
+### PyTorch Module Tests
+
+```bash
+pytest test_pytorch_modules.py -v
+```
+
+Tests validate:
+- ✓ GPU similarity functions (2D and 3D batched operations)
+- ✓ EigenMemory write/read operations and temporal decay
+- ✓ EigenAttention multi-head mechanics and causal masking
+- ✓ Gradient flow and differentiability
+- ✓ Integration between memory and attention modules
+- ✓ Consistency with NumPy implementation
 
 ## Applications
 
