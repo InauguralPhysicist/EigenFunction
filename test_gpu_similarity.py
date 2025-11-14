@@ -12,6 +12,7 @@ Tests can run with or without GPU:
 
 import numpy as np
 import pytest
+
 import gpu_similarity as gpu_sim
 from similarity import lorentz_similarity, standard_cosine_similarity
 

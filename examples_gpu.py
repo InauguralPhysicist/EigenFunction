@@ -17,13 +17,15 @@ Usage:
     python examples_gpu.py
 """
 
-import numpy as np
 import time
 from typing import Tuple
 
+import numpy as np
+
+import gpu_similarity as gpu_sim
+
 # Import both CPU and GPU implementations
 from similarity import lorentz_similarity, standard_cosine_similarity
-import gpu_similarity as gpu_sim
 
 
 def print_section(title: str):

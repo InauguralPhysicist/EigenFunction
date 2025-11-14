@@ -1,8 +1,9 @@
 import unittest
+
 import torch
 
-from eigen_memory import EigenMemory
 from eigen_attention import EigenAttention
+from eigen_memory import EigenMemory
 from eigen_transformer import EigenTransformerBlock
 from gpu_similarity import eigen_similarity
 

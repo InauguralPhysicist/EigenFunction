@@ -8,7 +8,8 @@ through neutral self-similarity.
 
 import numpy as np
 import pytest
-from similarity import lorentz_similarity, standard_cosine_similarity, compare_self_similarity
+
+from similarity import compare_self_similarity, lorentz_similarity, standard_cosine_similarity
 
 
 class TestSelfReferenceProperty:

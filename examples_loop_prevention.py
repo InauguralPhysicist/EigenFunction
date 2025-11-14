@@ -13,6 +13,7 @@ These examples cover:
 """
 
 import numpy as np
+
 from similarity import lorentz_similarity, standard_cosine_similarity
 
 

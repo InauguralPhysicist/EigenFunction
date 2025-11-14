@@ -38,9 +38,10 @@ Usage:
     >>>     print("GPU not available, using CPU fallback")
 """
 
-import numpy as np
-from typing import Union, Optional, Tuple
 import warnings
+from typing import Optional, Tuple, Union
+
+import numpy as np
 
 # Try to import CuPy for GPU acceleration
 try:
