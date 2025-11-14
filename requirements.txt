@@ -1,7 +1,12 @@
 numpy>=1.20.0
 pytest>=7.0.0
 
-# GPU acceleration (optional - install based on your CUDA version)
+# GPU acceleration - choose based on your framework:
+#
+# Option 1: PyTorch (for eigen_attention, eigen_memory, gpu_similarity)
+torch>=2.0.0
+#
+# Option 2: CuPy (for cupy_similarity - CUDA-only, NumPy API)
 # For CUDA 11.x: pip install cupy-cuda11x
 # For CUDA 12.x: pip install cupy-cuda12x
-# The gpu_similarity module will work without CuPy, falling back to CPU
+# Note: cupy_similarity will fall back to CPU without CuPy

@@ -193,6 +193,60 @@ This demonstrates loop prevention in:
 4. **Semantic Search** - Encourages query expansion exploration
 5. **Consciousness Modeling** - Implements eigengate measurement disruption
 
+## GPU Acceleration
+
+EigenFunction provides **two GPU acceleration options** to fit different workflows:
+
+### Option 1: PyTorch Neural Network Modules
+
+Full-featured PyTorch implementations with neural network components for deep learning:
+
+**EigenAttention** - Multi-head attention using Lorentz-invariant similarity:
+
+```python
+import torch
+from eigen_attention import EigenAttention
+
+attn = EigenAttention(dim=512, num_heads=8, loop_epsilon=1e-3)
+x = torch.randn(2, 100, 512)
+out, attn_weights = attn(x)
+```
+
+**EigenMemory** - External memory with Lorentz-invariant retrieval:
+
+```python
+from eigen_memory import EigenMemory
+
+mem = EigenMemory(dim=256, max_mem_slots=4096, k_top=32)
+mem.write(torch.randn(100, 256))
+retrieved = mem(torch.randn(10, 256))
+```
+
+**gpu_similarity** - Low-level PyTorch similarity functions:
+
+```python
+from gpu_similarity import eigen_similarity
+
+q, k = torch.randn(32, 128), torch.randn(1000, 128)
+sim = eigen_similarity(q, k)  # (32, 1000), self-sim = 0.0
+```
+
+### Option 2: CuPy CUDA Acceleration
+
+NumPy-compatible API using CuPy for raw CUDA performance:
+
+```python
+import cupy_similarity as cupy_sim
+import numpy as np
+
+if cupy_sim.is_gpu_available():
+    u = np.array([1.0, 2.0, 3.0])
+    v = np.array([4.0, 5.0, 6.0])
+    sim = cupy_sim.lorentz_similarity_gpu(u, v)
+```
+
+See `cupy_similarity.py` for batch processing, attention mechanisms, and CPU fallback.
+
 ### GPU Examples
 
 Run the GPU acceleration examples:
@@ -212,9 +266,7 @@ This demonstrates:
 
 ## Testing
 
-### CPU Tests
-
-Run the CPU test suite:
+### NumPy Implementation Tests
 
 ```bash
 pytest test_similarity.py -v
@@ -228,9 +280,21 @@ Tests validate:
 - ✓ Loop prevention via accumulation tests
 - ✓ Input validation and error handling
 
-### GPU Tests
+### PyTorch Module Tests
 
-Run the GPU test suite:
+```bash
+pytest test_pytorch_modules.py -v
+```
+
+Tests validate:
+- ✓ GPU similarity functions (2D and 3D batched operations)
+- ✓ EigenMemory write/read operations and temporal decay
+- ✓ EigenAttention multi-head mechanics and causal masking
+- ✓ Gradient flow and differentiability
+- ✓ Integration between memory and attention modules
+- ✓ Consistency with NumPy implementation
+
+### CuPy GPU Tests
 
 ```bash
 pytest test_gpu_similarity.py -v
