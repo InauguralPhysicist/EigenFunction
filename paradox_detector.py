@@ -15,10 +15,11 @@ Spacetime architecture: Should detect the circular reasoning and mark as paradox
 
 from __future__ import annotations
 
+from enum import Enum
+from typing import List, Tuple
+
 import torch
 import torch.nn as nn
-from typing import Tuple, List
-from enum import Enum
 
 
 class LogicType(Enum):

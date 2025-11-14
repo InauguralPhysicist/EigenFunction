@@ -16,9 +16,10 @@ Spacetime feedback: Should detect when reasoning loops back
 
 from __future__ import annotations
 
+from typing import List, Tuple
+
 import torch
 import torch.nn as nn
-from typing import List, Tuple
 
 
 def create_reasoning_chain(chain_type: str, length: int = 5, dim: int = 64) -> torch.Tensor:
