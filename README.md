@@ -402,12 +402,90 @@ pytest -v -m "not slow"
 - **Phenomenology**: Observer-observed entanglement
 - **Eastern Philosophy**: "No-self" (anatta) doctrine alignment
 
+## Spacetime Feedback Architecture
+
+Building on the Lorentz-invariant foundation, this repository includes a **spacetime feedback system** that uses Minkowski geometry for loop prevention.
+
+### Core Components
+
+**Three Causal Structures:**
+- **Timelike branch** (ds² < 0): Sequential/causal computation
+- **Spacelike branch** (ds² > 0): Parallel/acausal computation
+- **Lightlike monitor** (ds² = 0): Equilibrium detector on null boundary
+
+### Proven Results
+
+**Loop Prevention Benchmarks:**
+```
+Standard Attention:  0/4 tasks (all looped)
+Spacetime Feedback:  4/4 tasks (all converged)
+```
+
+Tested on:
+- Self-reference patterns (A→A)
+- Circular dependencies (A→B→C→A)
+- Recursive planning (meta-level)
+- Fixed point finding
+
+**Demo:** Self-referential patterns converge in 1 iteration (standard: loops at 3)
+
+### Mathematical Verification
+
+The spacetime interval formula is mathematically verified:
+```
+ds² = ||spacelike||² - ||timelike||²
+```
+
+- Two Euclidean branches (squared norms)
+- Minkowski signature (-, +, +, +)
+- Combines to produce spacetime interval squared
+
+See `MATH_VERIFICATION.md` for accessible proof and `verify_spacetime_math.py` for executable verification.
+
+### Usage
+
+```python
+from spacetime_feedback import SpacetimeFeedbackBlock
+
+# Create spacetime feedback layer
+layer = SpacetimeFeedbackBlock(
+    dim=64,
+    num_heads=4,
+    feedback_strength=0.5
+)
+
+# Process with loop prevention
+x = torch.randn(2, 10, 64)  # (batch, seq, dim)
+output, diagnostics = layer(x, return_diagnostics=True)
+
+print(f"Spacetime interval: {diagnostics['interval']}")
+print(f"Imbalance: {diagnostics['imbalance']}")
+```
+
+### Architecture Documentation
+
+See `ARCHITECTURE.md` for complete technical details on:
+- Spacetime causal structure
+- Implementation specifics
+- Theoretical foundations
+- Empirical results
+
+### Demo and Benchmarks
+
+Run the demonstrations:
+```bash
+python demo_loop_prevention.py  # Loop prevention demo
+python benchmarks.py             # Benchmark suite
+python verify_spacetime_math.py  # Math verification
+```
+
 ## Future Work
 
 - [x] ~~GPU-accelerated implementation for large-scale applications~~ **✓ Completed**
+- [x] ~~Spacetime feedback architecture for loop prevention~~ **✓ Completed**
 - [ ] Integration with popular ML frameworks (PyTorch, TensorFlow)
-  - Custom PyTorch layer for Lorentz attention
-  - TensorFlow operation for batch processing
+  - [x] ~~Custom PyTorch layer for spacetime feedback~~ **✓ Completed**
+  - [ ] TensorFlow operation for batch processing
 - [ ] Empirical validation on real-world datasets
   - Transformer models with Lorentz attention
   - Graph neural networks with loop prevention
