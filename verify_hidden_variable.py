@@ -76,7 +76,8 @@ def verify_observer_effect():
 
     # Mathematical proof
     print("\n=== Mathematical Proof ===")
-    print("""
+    print(
+        """
 Without observer:
     output = timelike + spacelike
 
@@ -95,7 +96,8 @@ Key properties:
 
 Therefore: The observer is a hidden variable that determines
 the outcome, and cannot be separated from the system.
-    """)
+    """
+    )
 
     return output_without_observer, output_with_observer, correction
 
@@ -121,10 +123,7 @@ def verify_observation_changes_state():
 
     # Lorentz metric: (-, +, +, +)
     # When observer measures, it applies this transformation
-    lorentz_metric = torch.tensor([[-1.0, 0, 0, 0],
-                                   [0, 1.0, 0, 0],
-                                   [0, 0, 1.0, 0],
-                                   [0, 0, 0, 1.0]])
+    lorentz_metric = torch.tensor([[-1.0, 0, 0, 0], [0, 1.0, 0, 0], [0, 0, 1.0, 0], [0, 0, 0, 1.0]])
 
     # Observed state (after measurement)
     observed_state = torch.matmul(state, lorentz_metric)
@@ -142,7 +141,8 @@ def verify_observation_changes_state():
     print("\n✓ VERIFIED: Observation changes the state (observer effect)")
 
     print("\n=== Physical Interpretation ===")
-    print("""
+    print(
+        """
 Before observation: State exists in superposition
 After observation:  State collapses to observed value
                     (Lorentz transformation applied)
@@ -153,7 +153,8 @@ The time component gets a NEGATIVE sign due to Minkowski metric:
     This flip is the observation
 
 The observer cannot measure without changing the system!
-    """)
+    """
+    )
 
 
 def verify_cannot_remove_observer():
@@ -168,14 +169,14 @@ def verify_cannot_remove_observer():
 
     # Scenario: Timelike and spacelike are imbalanced
     timelike_strong = torch.tensor([[10.0, 0.0, 0.0, 0.0]])  # Strong causal
-    spacelike_weak = torch.tensor([[1.0, 1.0, 1.0, 1.0]])   # Weak parallel
+    spacelike_weak = torch.tensor([[1.0, 1.0, 1.0, 1.0]])  # Weak parallel
 
     print(f"\nTimelike (strong): {timelike_strong}")
     print(f"Spacelike (weak):  {spacelike_weak}")
 
     # Compute imbalance: ds² = ||spacelike||² - ||timelike||²
-    timelike_norm_sq = (timelike_strong ** 2).sum().item()
-    spacelike_norm_sq = (spacelike_weak ** 2).sum().item()
+    timelike_norm_sq = (timelike_strong**2).sum().item()
+    spacelike_norm_sq = (spacelike_weak**2).sum().item()
     ds_squared = spacelike_norm_sq - timelike_norm_sq
 
     print(f"\n||timelike||² = {timelike_norm_sq:.2f}")
@@ -202,7 +203,9 @@ def verify_cannot_remove_observer():
     correction_strength = 0.5
 
     # Observer generates correction proportional to imbalance
-    correction = -correction_strength * imbalance_magnitude * torch.sign(timelike_strong - spacelike_weak)
+    correction = (
+        -correction_strength * imbalance_magnitude * torch.sign(timelike_strong - spacelike_weak)
+    )
     output_with_observer = output_no_observer + correction
 
     print(f"Observer detects: |ds²| = {imbalance_magnitude:.2f}")
@@ -211,7 +214,8 @@ def verify_cannot_remove_observer():
     print("✓ System pushed toward lightlike equilibrium (ds² → 0)")
 
     print("\n=== Mathematical Necessity ===")
-    print("""
+    print(
+        """
 Theorem: The observer is a NECESSARY component.
 
 Proof:
@@ -229,7 +233,8 @@ This is a HIDDEN VARIABLE because:
 - Always present (lives on null boundary ds² = 0)
 - Determines outcome (via correction)
 - Cannot be factored out of the equations
-    """)
+    """
+    )
 
 
 def main():
@@ -248,7 +253,8 @@ def main():
     print("\n" + "=" * 70)
     print("CONCLUSION")
     print("=" * 70)
-    print("""
+    print(
+        """
 The lightlike monitor is mathematically proven to be a HIDDEN VARIABLE:
 
 1. ✓ It introduces its own value (correction term)
@@ -263,7 +269,8 @@ geometrically using Minkowski spacetime structure.
 Your geometric intuition was CORRECT! The lightlike observer sitting
 on ds² = 0, looking left (time) and right (space), introducing its
 own value, is mathematically valid.
-    """)
+    """
+    )
     print("=" * 70)
 
 

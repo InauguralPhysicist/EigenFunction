@@ -21,9 +21,7 @@ import torch.nn as nn
 from typing import List, Tuple
 
 
-def create_reasoning_chain(
-    chain_type: str, length: int = 5, dim: int = 64
-) -> torch.Tensor:
+def create_reasoning_chain(chain_type: str, length: int = 5, dim: int = 64) -> torch.Tensor:
     """Create a reasoning chain embedding."""
     x = torch.randn(1, length, dim)
 
@@ -86,9 +84,7 @@ def validate_chain_with_spacetime(x: torch.Tensor) -> Tuple[bool, dict]:
     avg_imbalance = sum(imbalances) / len(imbalances)
 
     # Count oscillations
-    oscillations = sum(
-        1 for i in range(1, len(intervals)) if intervals[i] * intervals[i - 1] < 0
-    )
+    oscillations = sum(1 for i in range(1, len(intervals)) if intervals[i] * intervals[i - 1] < 0)
 
     # Valid if converges and doesn't oscillate much
     is_valid = final_imbalance < 0.2 and oscillations < 2
@@ -141,12 +137,14 @@ def test_chain_validation():
         print()
 
         correct = is_valid == expected_valid
-        results.append({
-            "description": description,
-            "expected": expected_valid,
-            "detected": is_valid,
-            "correct": correct,
-        })
+        results.append(
+            {
+                "description": description,
+                "expected": expected_valid,
+                "detected": is_valid,
+                "correct": correct,
+            }
+        )
 
         status = "✓" if correct else "✗"
         print(f"{status} {'Correct' if correct else 'Wrong'}")
