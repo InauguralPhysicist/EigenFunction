@@ -89,6 +89,12 @@ pip install -r requirements.txt
   - For CUDA 12.x: `pip install cupy-cuda12x`
   - GPU module works without CuPy, automatically falling back to CPU
 
+**Optional (for PyTorch neural network modules):**
+- PyTorch >= 2.0
+  - CPU only: `pip install torch`
+  - With CUDA: See [pytorch.org](https://pytorch.org/get-started/locally/)
+  - Required for `eigen_attention.py` and `eigen_memory.py` modules
+
 ## Usage
 
 ### Basic Similarity Computation
@@ -175,6 +181,93 @@ attention_scores = gpu_sim.lorentz_similarity_matrix_gpu(embeddings, embeddings)
 sim = gpu_sim.lorentz_similarity_auto(u, v, prefer_gpu=True)
 ```
 
+### PyTorch Neural Network Modules
+
+EigenFunction provides ready-to-use PyTorch modules for attention and memory:
+
+```python
+import torch
+from eigen_attention import EigenAttention
+from eigen_memory import EigenMemory
+
+# EigenAttention: Multi-head attention with loop prevention
+attn = EigenAttention(
+    dim=512,              # Model dimension
+    num_heads=8,          # Number of attention heads
+    sim_scale=4.0,        # Scale factor for similarities
+    loop_epsilon=1e-3,    # Loop prevention threshold
+    causal=False          # Set True for autoregressive models
+).to('cuda')
+
+# Process sequences
+x = torch.randn(32, 128, 512).cuda()  # (batch, seq_len, dim)
+output, attn_weights = attn(x)
+# output: (32, 128, 512), attn_weights: (32, 8, 128, 128)
+# Diagonal of attn_weights is suppressed (loop prevention!)
+
+# EigenMemory: Differentiable memory with Lorentz-based retrieval
+memory = EigenMemory(
+    dim=512,              # Memory vector dimension
+    max_mem_slots=4096,   # Maximum memory capacity
+    k_top=32,             # Top-k neighbors to retrieve
+    loop_epsilon=1e-3,    # Loop prevention threshold
+    decay=0.99            # Temporal decay factor
+).to('cuda')
+
+# Write to memory
+states = torch.randn(100, 512).cuda()
+memory.write(states)
+
+# Retrieve from memory
+queries = torch.randn(32, 512).cuda()
+retrieved = memory(queries)  # (32, 512)
+# Retrieved vectors won't be identical to queries (loop prevention)
+
+# Retrieve with attention weights
+retrieved, (attn, indices) = memory(queries, return_weights=True)
+# attn: (32, k_top), indices: (32, k_top)
+```
+
+**Key Features:**
+
+- **Gradient Flow**: Both modules are fully differentiable for end-to-end training
+- **Loop Prevention**: Self-similarity ~0 prevents pathological feedback
+- **Device Support**: Automatically handles CPU/CUDA placement
+- **Efficient**: Leverages GPU-accelerated similarity computation
+- **Flexible**: Compatible with standard PyTorch training pipelines
+
+**Example: Transformer with Loop Prevention**
+
+```python
+import torch.nn as nn
+
+class EigenTransformerBlock(nn.Module):
+    def __init__(self, dim, num_heads):
+        super().__init__()
+        self.attn = EigenAttention(dim, num_heads)
+        self.mlp = nn.Sequential(
+            nn.Linear(dim, 4 * dim),
+            nn.GELU(),
+            nn.Linear(4 * dim, dim)
+        )
+        self.norm1 = nn.LayerNorm(dim)
+        self.norm2 = nn.LayerNorm(dim)
+
+    def forward(self, x):
+        # Self-attention with loop prevention
+        attn_out, _ = self.attn(self.norm1(x))
+        x = x + attn_out
+
+        # MLP
+        x = x + self.mlp(self.norm2(x))
+        return x
+
+# Use in model
+model = EigenTransformerBlock(dim=512, num_heads=8).cuda()
+x = torch.randn(32, 128, 512).cuda()
+output = model(x)
+```
+
 ## Examples
 
 ### CPU Examples
@@ -244,6 +337,26 @@ GPU tests validate:
 - ✓ Attention mechanism simulation
 - ✓ Numerical stability on GPU
 - ✓ Large-scale performance characteristics
+
+### PyTorch Module Tests
+
+Run the PyTorch module test suite:
+
+```bash
+pytest test_eigen_modules.py -v
+```
+
+PyTorch tests validate:
+- ✓ EigenAttention module functionality and gradient flow
+- ✓ EigenMemory module write/read operations
+- ✓ Loop prevention in attention (self-attention suppression)
+- ✓ Loop prevention in memory (self-retrieval avoidance)
+- ✓ Causal masking and external attention masks
+- ✓ Multi-head attention independence
+- ✓ Device handling (CPU/CUDA)
+- ✓ Gradient backpropagation through both modules
+- ✓ Integration tests (attention + memory pipelines)
+- ✓ Edge cases and error handling
 
 Run all tests (excluding slow tests):
 
@@ -335,9 +448,14 @@ pytest -v -m "not slow"
 ## Future Work
 
 - [x] ~~GPU-accelerated implementation for large-scale applications~~ **✓ Completed**
-- [ ] Integration with popular ML frameworks (PyTorch, TensorFlow)
-  - Custom PyTorch layer for Lorentz attention
-  - TensorFlow operation for batch processing
+- [x] ~~PyTorch integration~~ **✓ Completed**
+  - ✓ EigenAttention: Multi-head attention with loop prevention
+  - ✓ EigenMemory: Differentiable memory module with Lorentz retrieval
+  - ✓ Full gradient support for end-to-end training
+  - ✓ Comprehensive test suite
+- [ ] TensorFlow integration
+  - Custom TensorFlow operations for batch processing
+  - Keras layers for attention and memory
 - [ ] Empirical validation on real-world datasets
   - Transformer models with Lorentz attention
   - Graph neural networks with loop prevention

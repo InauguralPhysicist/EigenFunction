@@ -5,3 +5,10 @@ pytest>=7.0.0
 # For CUDA 11.x: pip install cupy-cuda11x
 # For CUDA 12.x: pip install cupy-cuda12x
 # The gpu_similarity module will work without CuPy, falling back to CPU
+
+# PyTorch integration (optional - for neural network modules)
+# Install PyTorch based on your system:
+# CPU only: pip install torch
+# CUDA 11.8: pip install torch --index-url https://download.pytorch.org/whl/cu118
+# CUDA 12.1: pip install torch --index-url https://download.pytorch.org/whl/cu121
+# See https://pytorch.org/get-started/locally/ for more options

@@ -534,3 +534,224 @@ def lorentz_similarity_auto(
         # Fall back to CPU implementation
         from similarity import lorentz_similarity
         return lorentz_similarity(u, v, epsilon=epsilon)
+
+
+# PyTorch Integration
+# ===================
+
+# Try to import PyTorch
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    torch = None
+
+
+def eigen_similarity(
+    U: Union[np.ndarray, 'cp.ndarray', 'torch.Tensor'],
+    V: Union[np.ndarray, 'cp.ndarray', 'torch.Tensor'],
+    epsilon: float = 1e-10,
+) -> Union[np.ndarray, 'cp.ndarray', 'torch.Tensor']:
+    """
+    Compute pairwise Lorentz-invariant (EigenFunction) similarity matrix.
+
+    This is the primary interface for PyTorch modules (eigen_memory, eigen_attention).
+    Supports batched computation of all pairwise similarities between vectors in U and V.
+
+    **Loop Prevention**: Diagonal elements (self-similarity) are ~0.0, preventing
+    pathological feedback loops in attention and memory mechanisms.
+
+    Parameters:
+    -----------
+    U : Union[np.ndarray, cp.ndarray, torch.Tensor]
+        First batch of vectors, shape (N, D) or (B, L, D)
+        - If 2D: N vectors of dimension D
+        - If 3D: Flattened to (B*L, D) for computation
+    V : Union[np.ndarray, cp.ndarray, torch.Tensor]
+        Second batch of vectors, shape (M, D) or (B, L, D)
+        - If 2D: M vectors of dimension D
+        - If 3D: Flattened to (B*L, D) for computation
+    epsilon : float
+        Small constant for numerical stability (default: 1e-10)
+
+    Returns:
+    --------
+    Union[np.ndarray, cp.ndarray, torch.Tensor]
+        Pairwise similarity matrix
+        - If U is (N, D) and V is (M, D): returns (N, M)
+        - If U is (B, L, D) and V is (B, L, D): returns (B*L, B*L)
+        Returns same type as input (numpy/cupy/torch)
+
+    Notes:
+    ------
+    - Self-similarity (diagonal when U=V) is ~0.0 (lightlike boundary)
+    - Similarities are in range [-1, 1]
+    - Automatically uses GPU if tensors are on CUDA device
+    - For PyTorch tensors, gradients are preserved
+
+    Examples:
+    ---------
+    >>> import torch
+    >>> import gpu_similarity as gpu_sim
+    >>>
+    >>> # Attention mechanism
+    >>> queries = torch.randn(8, 64, 512)  # (batch, seq_len, dim)
+    >>> keys = torch.randn(8, 64, 512)
+    >>> sim = gpu_sim.eigen_similarity(queries, keys)  # (8*64, 8*64)
+    >>>
+    >>> # Memory retrieval
+    >>> query = torch.randn(32, 256)  # (batch, dim)
+    >>> memory = torch.randn(1000, 256)  # (mem_size, dim)
+    >>> sim = gpu_sim.eigen_similarity(query, memory)  # (32, 1000)
+    """
+    # Handle PyTorch tensors
+    if TORCH_AVAILABLE and isinstance(U, torch.Tensor):
+        return _eigen_similarity_torch(U, V, epsilon)
+
+    # Handle 3D arrays by flattening
+    original_shape_U = None
+    original_shape_V = None
+
+    if hasattr(U, 'ndim'):
+        if U.ndim == 3:
+            original_shape_U = U.shape
+            B, L, D = U.shape
+            U = U.reshape(B * L, D)
+        elif U.ndim != 2:
+            raise ValueError(f"U must be 2D or 3D, got shape {U.shape}")
+
+    if hasattr(V, 'ndim'):
+        if V.ndim == 3:
+            original_shape_V = V.shape
+            B, L, D = V.shape
+            V = V.reshape(B * L, D)
+        elif V.ndim != 2:
+            raise ValueError(f"V must be 2D or 3D, got shape {V.shape}")
+
+    # Use the existing matrix computation
+    result = lorentz_similarity_matrix_gpu(U, V, epsilon=epsilon, return_cpu=False)
+
+    return result
+
+
+def _eigen_similarity_torch(
+    U: 'torch.Tensor',
+    V: 'torch.Tensor',
+    epsilon: float = 1e-10,
+) -> 'torch.Tensor':
+    """
+    PyTorch-native implementation of EigenFunction similarity.
+
+    Preserves gradients for backpropagation and respects device placement.
+
+    Parameters:
+    -----------
+    U : torch.Tensor
+        Shape (N, D) or (B, L, D)
+    V : torch.Tensor
+        Shape (M, D) or (B, L, D)
+    epsilon : float
+        Numerical stability constant
+
+    Returns:
+    --------
+    torch.Tensor
+        Similarity matrix, shape (N, M) or (B*L, B*L)
+        Same device and dtype as inputs
+    """
+    if not TORCH_AVAILABLE:
+        raise RuntimeError("PyTorch not available")
+
+    # Handle 3D tensors by flattening
+    reshape_output = False
+    if U.ndim == 3:
+        B, L, D = U.shape
+        U_flat = U.reshape(B * L, D)
+        reshape_output = True
+    elif U.ndim == 2:
+        U_flat = U
+        N, D = U.shape
+    else:
+        raise ValueError(f"U must be 2D or 3D, got shape {U.shape}")
+
+    if V.ndim == 3:
+        B_v, L_v, D_v = V.shape
+        V_flat = V.reshape(B_v * L_v, D_v)
+    elif V.ndim == 2:
+        V_flat = V
+        M, D_v = V.shape
+    else:
+        raise ValueError(f"V must be 2D or 3D, got shape {V.shape}")
+
+    if U_flat.shape[1] != V_flat.shape[1]:
+        raise ValueError(
+            f"Dimension mismatch: U has dim {U_flat.shape[1]}, "
+            f"V has dim {V_flat.shape[1]}"
+        )
+
+    N = U_flat.shape[0]
+    M = V_flat.shape[0]
+    D = U_flat.shape[1]
+
+    device = U_flat.device
+    dtype = U_flat.dtype
+
+    # Compute norms
+    norms_U = torch.norm(U_flat, dim=1, keepdim=True)  # (N, 1)
+    norms_V = torch.norm(V_flat, dim=1, keepdim=True)  # (M, 1)
+
+    # Spatial dot products: U @ V^T
+    spatial_products = torch.mm(U_flat, V_flat.T)  # (N, M)
+
+    # Lorentz inner products
+    # <u, v>_L = u·v - ||u|| * ||v||
+    lorentz_products_uv = spatial_products - (norms_U @ norms_V.T)
+
+    # Self inner products (lightlike)
+    # <u, u>_L = ||u||² - ||u||² = 0
+    lorentz_products_uu = norms_U ** 2 - norms_U ** 2  # (N, 1), all zeros
+    lorentz_products_vv = norms_V ** 2 - norms_V ** 2  # (M, 1), all zeros
+
+    # Denominators: sqrt(|<u,u>_L| * |<v,v>_L|)
+    # Since both are ~0 (lightlike), denominator is ~0
+    # We need to handle this carefully to avoid NaN in gradients
+    denominator_squared = torch.abs(lorentz_products_uu) @ torch.abs(lorentz_products_vv).T
+
+    # Mask for valid (non-lightlike) computations
+    valid_mask = denominator_squared >= epsilon
+
+    # Initialize similarities
+    similarities = torch.zeros(N, M, dtype=dtype, device=device)
+
+    # Compute similarities where valid
+    # Use safe division: add epsilon to denominator
+    safe_denom_sq = denominator_squared + epsilon
+    safe_denom = torch.sqrt(safe_denom_sq)
+
+    # Compute similarities
+    sim_values = lorentz_products_uv / safe_denom
+
+    # Only use values where denominator was actually valid
+    similarities = torch.where(
+        valid_mask,
+        sim_values,
+        torch.zeros_like(sim_values)
+    )
+
+    # Clamp to valid range
+    similarities = torch.clamp(similarities, -1.0, 1.0)
+
+    return similarities
+
+
+def is_torch_available() -> bool:
+    """
+    Check if PyTorch is available.
+
+    Returns:
+    --------
+    bool
+        True if PyTorch is installed
+    """
+    return TORCH_AVAILABLE
