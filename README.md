@@ -1,5 +1,11 @@
 # EigenFunction: Lorentz-Invariant Similarity for Loop Prevention
 
+[![CI](https://github.com/InauguralPhysicist/EigenFunction/workflows/CI/badge.svg)](https://github.com/InauguralPhysicist/EigenFunction/actions)
+[![codecov](https://codecov.io/gh/InauguralPhysicist/EigenFunction/branch/main/graph/badge.svg)](https://codecov.io/gh/InauguralPhysicist/EigenFunction)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 A novel approach to similarity measures in self-referential systems that uses Lorentz-invariant geometry to prevent pathological feedback loops.
 
 ## Overview
