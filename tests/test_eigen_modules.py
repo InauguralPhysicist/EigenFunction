@@ -131,17 +131,9 @@ class TestEigenModules(unittest.TestCase):
         Verify EigenAttention and EigenMemory can be composed without numerical issues.
         """
         memory = EigenMemory(
-            self.dim,
-            max_mem_slots=20,
-            k_top=5,
-            loop_epsilon=1e-3,
-            device=self.device
+            self.dim, max_mem_slots=20, k_top=5, loop_epsilon=1e-3, device=self.device
         )
-        attn = EigenAttention(
-            self.dim,
-            self.num_heads,
-            loop_epsilon=1e-3
-        ).to(self.device)
+        attn = EigenAttention(self.dim, self.num_heads, loop_epsilon=1e-3).to(self.device)
 
         # Create a simple sequence
         B, L = 2, 5
@@ -170,7 +162,7 @@ class TestEigenModules(unittest.TestCase):
         attn_sums = attn_weights.sum(dim=-1)
         self.assertTrue(
             torch.allclose(attn_sums, torch.ones_like(attn_sums), atol=1e-5),
-            "Attention weights should sum to 1"
+            "Attention weights should sum to 1",
         )
 
 

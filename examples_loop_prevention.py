@@ -28,9 +28,9 @@ def example_1_attention_mechanism():
     Lorentz similarity gives 0.0 self-attention, forcing the mechanism to
     weight other tokens equally based on their actual relevance.
     """
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("EXAMPLE 1: Self-Attention Mechanism")
-    print("="*70)
+    print("=" * 70)
 
     # Simulate token embeddings
     token_embeddings = [
@@ -77,18 +77,18 @@ def example_2_graph_traversal():
 
     Lorentz similarity prevents this by assigning 0.0 weight to self-edges.
     """
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("EXAMPLE 2: Graph Traversal with Similarity-Based Edges")
-    print("="*70)
+    print("=" * 70)
 
     # Semantic concept embeddings
     concepts = {
-        'dog': np.array([0.8, 0.6, 0.1, 0.2]),
-        'cat': np.array([0.7, 0.5, 0.2, 0.3]),
-        'car': np.array([0.1, 0.2, 0.9, 0.8]),
+        "dog": np.array([0.8, 0.6, 0.1, 0.2]),
+        "cat": np.array([0.7, 0.5, 0.2, 0.3]),
+        "car": np.array([0.1, 0.2, 0.9, 0.8]),
     }
 
-    start_concept = 'dog'
+    start_concept = "dog"
     start_embedding = concepts[start_concept]
 
     print(f"\nStarting from concept: '{start_concept}'")
@@ -128,9 +128,9 @@ def example_3_iterative_refinement():
 
     Lorentz similarity's neutral self-reference encourages genuine evolution.
     """
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("EXAMPLE 3: Iterative Refinement System")
-    print("="*70)
+    print("=" * 70)
 
     # Initial state
     state = np.array([1.0, 0.5, 0.2])
@@ -153,8 +153,10 @@ def example_3_iterative_refinement():
         noise = np.random.randn(3) * 0.1
         current_standard = current_standard + noise * update_magnitude
 
-        print(f"  Iteration {i+1}: self_sim = {self_sim:.4f}, "
-              f"update_magnitude = {update_magnitude:.4f}")
+        print(
+            f"  Iteration {i+1}: self_sim = {self_sim:.4f}, "
+            f"update_magnitude = {update_magnitude:.4f}"
+        )
 
     print(f"  Final state: {current_standard}")
     print(f"  Total change: {np.linalg.norm(current_standard - state):.4f}")
@@ -169,8 +171,10 @@ def example_3_iterative_refinement():
         noise = np.random.randn(3) * 0.1
         current_lorentz = current_lorentz + noise * update_magnitude
 
-        print(f"  Iteration {i+1}: self_sim = {self_sim:.4f}, "
-              f"update_magnitude = {update_magnitude:.4f}")
+        print(
+            f"  Iteration {i+1}: self_sim = {self_sim:.4f}, "
+            f"update_magnitude = {update_magnitude:.4f}"
+        )
 
     print(f"  Final state: {current_lorentz}")
     print(f"  Total change: {np.linalg.norm(current_lorentz - state):.4f}")
@@ -190,15 +194,15 @@ def example_4_semantic_feedback():
     to refine the query can create loops if the query becomes too similar to
     itself, preventing exploration of the semantic space.
     """
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("EXAMPLE 4: Semantic Search Query Refinement")
-    print("="*70)
+    print("=" * 70)
 
     # Document embeddings
     documents = {
-        'doc_A': np.array([0.9, 0.1, 0.1]),
-        'doc_B': np.array([0.1, 0.9, 0.1]),
-        'doc_C': np.array([0.1, 0.1, 0.9]),
+        "doc_A": np.array([0.9, 0.1, 0.1]),
+        "doc_B": np.array([0.1, 0.9, 0.1]),
+        "doc_C": np.array([0.1, 0.1, 0.9]),
     }
 
     # Initial query
@@ -234,9 +238,11 @@ def example_4_semantic_feedback():
         # Refine query
         query_standard = 0.7 * query_standard + 0.3 * best_doc
 
-        print(f"  Iteration {iteration + 1}: "
-              f"best_doc_sim = {best_sim:.4f}, "
-              f"query_self_sim = {self_sim:.4f}")
+        print(
+            f"  Iteration {iteration + 1}: "
+            f"best_doc_sim = {best_sim:.4f}, "
+            f"query_self_sim = {self_sim:.4f}"
+        )
 
     # Lorentz approach
     query_lorentz = query.copy()
@@ -257,9 +263,11 @@ def example_4_semantic_feedback():
         # Refine query
         query_lorentz = 0.7 * query_lorentz + 0.3 * best_doc
 
-        print(f"  Iteration {iteration + 1}: "
-              f"best_doc_sim = {best_sim:.4f}, "
-              f"query_self_sim = {self_sim:.4f}")
+        print(
+            f"  Iteration {iteration + 1}: "
+            f"best_doc_sim = {best_sim:.4f}, "
+            f"query_self_sim = {self_sim:.4f}"
+        )
 
     print("\nAnalysis:")
     print("  Standard: Query self-similarity increases toward 1.0")
@@ -278,9 +286,9 @@ def example_5_consciousness_model():
     boundary (ds² = 0) inherently disrupt self-reinforcement, promoting
     evolutionary dynamics.
     """
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("EXAMPLE 5: Consciousness Model - Eigengate Framework")
-    print("="*70)
+    print("=" * 70)
 
     # Mental state embedding
     conscious_state = np.array([0.6, 0.8, 0.3, 0.5])
@@ -345,9 +353,9 @@ def example_5_consciousness_model():
 
 def run_all_examples():
     """Run all loop prevention examples."""
-    print("\n" + "#"*70)
+    print("\n" + "#" * 70)
     print("# LORENTZ-INVARIANT SIMILARITY: LOOP PREVENTION DEMONSTRATIONS")
-    print("#"*70)
+    print("#" * 70)
 
     example_1_attention_mechanism()
     example_2_graph_traversal()
@@ -355,9 +363,9 @@ def run_all_examples():
     example_4_semantic_feedback()
     example_5_consciousness_model()
 
-    print("\n" + "#"*70)
+    print("\n" + "#" * 70)
     print("# SUMMARY")
-    print("#"*70)
+    print("#" * 70)
     print("\nKey Finding:")
     print("  Lorentz-invariant similarity's neutral self-reference (0.0)")
     print("  prevents pathological loops in self-referential systems by:")
@@ -370,7 +378,7 @@ def run_all_examples():
     print()
     print("This is NOT a general solution to the halting problem, but rather")
     print("a geometric safeguard within specifically designed architectures.")
-    print("#"*70 + "\n")
+    print("#" * 70 + "\n")
 
 
 if __name__ == "__main__":

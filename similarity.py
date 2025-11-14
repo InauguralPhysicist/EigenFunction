@@ -39,11 +39,7 @@ import numpy as np
 from typing import Union, Optional
 
 
-def lorentz_similarity(
-    u: np.ndarray,
-    v: np.ndarray,
-    epsilon: float = 1e-10
-) -> float:
+def lorentz_similarity(u: np.ndarray, v: np.ndarray, epsilon: float = 1e-10) -> float:
     """
     Compute Lorentz-invariant cosine similarity between two vectors.
 
@@ -119,11 +115,7 @@ def lorentz_similarity(
     return np.clip(similarity, -1.0, 1.0)
 
 
-def standard_cosine_similarity(
-    u: np.ndarray,
-    v: np.ndarray,
-    epsilon: float = 1e-10
-) -> float:
+def standard_cosine_similarity(u: np.ndarray, v: np.ndarray, epsilon: float = 1e-10) -> float:
     """
     Compute standard cosine similarity between two vectors.
 
@@ -207,11 +199,11 @@ def compare_self_similarity(vector: np.ndarray) -> dict:
     lorentz = lorentz_similarity(vector, vector)
 
     return {
-        'standard': standard,
-        'lorentz': lorentz,
-        'vector_norm': np.linalg.norm(vector),
-        'interpretation': {
-            'standard': 'Perfect self-reinforcement (1.0) - potential loop amplifier',
-            'lorentz': 'Neutral self-reference (0.0) - loop prevention via lightlike boundary'
-        }
+        "standard": standard,
+        "lorentz": lorentz,
+        "vector_norm": np.linalg.norm(vector),
+        "interpretation": {
+            "standard": "Perfect self-reinforcement (1.0) - potential loop amplifier",
+            "lorentz": "Neutral self-reference (0.0) - loop prevention via lightlike boundary",
+        },
     }

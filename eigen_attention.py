@@ -66,11 +66,7 @@ class EigenAttention(nn.Module):
         """
         (B*H, L, d_head) -> (B, L, D)
         """
-        return (
-            x.view(B, self.num_heads, L, self.head_dim)
-            .transpose(1, 2)
-            .reshape(B, L, self.dim)
-        )
+        return x.view(B, self.num_heads, L, self.head_dim).transpose(1, 2).reshape(B, L, self.dim)
 
     def forward(
         self,
@@ -107,7 +103,7 @@ class EigenAttention(nn.Module):
         v = self._reshape_to_heads(v)  # (B*H, L, d_head)
 
         # Eigen similarity per head: (B*H, L_q, L_k)
-        sim = eigen_similarity(q, k)   # expected in [-1, 1]
+        sim = eigen_similarity(q, k)  # expected in [-1, 1]
 
         # loop prevention: attenuate near-self/lightlike connections
         sim = torch.where(
@@ -150,9 +146,7 @@ class EigenAttention(nn.Module):
                     attn_mask_expanded = attn_mask.repeat(1, self.num_heads, 1, 1)
                 else:
                     attn_mask_expanded = attn_mask
-                attn_mask_expanded = attn_mask_expanded.reshape(
-                    B * self.num_heads, L, L
-                )
+                attn_mask_expanded = attn_mask_expanded.reshape(B * self.num_heads, L, L)
                 logits = logits + attn_mask_expanded
             else:
                 raise ValueError(

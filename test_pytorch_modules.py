@@ -29,8 +29,9 @@ class TestGPUSimilarity:
 
         # Diagonal should be near zero
         diag = torch.diagonal(sim)
-        assert torch.allclose(diag, torch.zeros_like(diag), atol=1e-5), \
-            f"Expected diagonal ~0.0, got {diag}"
+        assert torch.allclose(
+            diag, torch.zeros_like(diag), atol=1e-5
+        ), f"Expected diagonal ~0.0, got {diag}"
 
     def test_standard_cosine_2d_self_is_one(self):
         """Standard cosine self-similarity should be ~1.0."""
@@ -38,8 +39,9 @@ class TestGPUSimilarity:
         sim = standard_cosine_similarity_torch(q, q)
 
         diag = torch.diagonal(sim)
-        assert torch.allclose(diag, torch.ones_like(diag), atol=1e-5), \
-            f"Expected diagonal ~1.0, got {diag}"
+        assert torch.allclose(
+            diag, torch.ones_like(diag), atol=1e-5
+        ), f"Expected diagonal ~1.0, got {diag}"
 
     def test_eigen_similarity_3d_self_is_zero(self):
         """Eigen self-similarity for sequences should be ~0.0."""
@@ -51,8 +53,9 @@ class TestGPUSimilarity:
         # Diagonal should be near zero for each batch
         for b in range(4):
             diag = torch.diagonal(sim[b])
-            assert torch.allclose(diag, torch.zeros_like(diag), atol=1e-5), \
-                f"Batch {b}: Expected diagonal ~0.0, got {diag}"
+            assert torch.allclose(
+                diag, torch.zeros_like(diag), atol=1e-5
+            ), f"Batch {b}: Expected diagonal ~0.0, got {diag}"
 
     def test_standard_cosine_3d_self_is_one(self):
         """Standard cosine for sequences should have diagonal ~1.0."""
@@ -86,16 +89,16 @@ class TestGPUSimilarity:
         v = torch.randn(10, 64)
         result = compare_self_similarity_torch(v)
 
-        assert 'standard' in result
-        assert 'eigen' in result
-        assert 'vector_norm' in result
+        assert "standard" in result
+        assert "eigen" in result
+        assert "vector_norm" in result
 
         # Standard diagonal should be ~1.0
-        std_diag = torch.diagonal(result['standard'])
+        std_diag = torch.diagonal(result["standard"])
         assert torch.allclose(std_diag, torch.ones_like(std_diag), atol=1e-5)
 
         # Eigen diagonal should be ~0.0
-        eigen_diag = torch.diagonal(result['eigen'])
+        eigen_diag = torch.diagonal(result["eigen"])
         assert torch.allclose(eigen_diag, torch.zeros_like(eigen_diag), atol=1e-5)
 
     @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA not available")
@@ -105,7 +108,7 @@ class TestGPUSimilarity:
         k = torch.randn(32, 64).cuda()
 
         sim = eigen_similarity(q, k)
-        assert sim.device.type == 'cuda'
+        assert sim.device.type == "cuda"
         assert sim.shape == (16, 32)
 
     def test_numerical_stability_small_vectors(self):
@@ -233,9 +236,9 @@ class TestEigenMemory:
     @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA not available")
     def test_gpu_device(self):
         """Test memory works on GPU."""
-        mem = EigenMemory(dim=32, max_mem_slots=100, device='cuda')
+        mem = EigenMemory(dim=32, max_mem_slots=100, device="cuda")
 
-        assert mem.device.type == 'cuda'
+        assert mem.device.type == "cuda"
 
         x = torch.randn(10, 32).cuda()
         mem.write(x)
@@ -243,7 +246,7 @@ class TestEigenMemory:
         q = torch.randn(3, 32).cuda()
         retrieved = mem(q)
 
-        assert retrieved.device.type == 'cuda'
+        assert retrieved.device.type == "cuda"
 
 
 class TestEigenAttention:
@@ -290,8 +293,9 @@ class TestEigenAttention:
             for i in range(5):
                 for j in range(i + 1, 5):
                     # Position i should not attend to future position j
-                    assert attn_weights[0, h, i, j].item() < 1e-5, \
-                        f"Causal mask violated: position {i} attends to {j}"
+                    assert (
+                        attn_weights[0, h, i, j].item() < 1e-5
+                    ), f"Causal mask violated: position {i} attends to {j}"
 
     def test_external_mask_3d(self):
         """Test external 3D attention mask (B, L, L)."""
@@ -301,7 +305,7 @@ class TestEigenAttention:
 
         # Create mask that blocks position 0 from attending to position 4
         mask = torch.zeros(2, 5, 5)
-        mask[:, 0, 4] = float('-inf')
+        mask[:, 0, 4] = float("-inf")
 
         _, attn_weights = attn(x, attn_mask=mask)
 
@@ -318,7 +322,7 @@ class TestEigenAttention:
 
         # 4D mask
         mask = torch.zeros(2, 1, 5, 5)
-        mask[:, :, 0, 4] = float('-inf')
+        mask[:, :, 0, 4] = float("-inf")
 
         _, attn_weights = attn(x, attn_mask=mask)
 
@@ -340,12 +344,7 @@ class TestEigenAttention:
 
     def test_negative_masking(self):
         """Test that negative similarities can be masked."""
-        attn = EigenAttention(
-            dim=32,
-            num_heads=2,
-            mask_negative=True,
-            negative_floor=-10.0
-        )
+        attn = EigenAttention(dim=32, num_heads=2, mask_negative=True, negative_floor=-10.0)
 
         x = torch.randn(1, 5, 32)
         out, _ = attn(x)
@@ -375,8 +374,8 @@ class TestEigenAttention:
         x = torch.randn(2, 10, 64).cuda()
         out, attn_weights = attn(x)
 
-        assert out.device.type == 'cuda'
-        assert attn_weights.device.type == 'cuda'
+        assert out.device.type == "cuda"
+        assert attn_weights.device.type == "cuda"
 
     def test_gradient_flow(self):
         """Test that gradients flow through attention."""
