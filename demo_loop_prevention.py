@@ -12,12 +12,13 @@ Task: Self-referential reasoning
 
 from __future__ import annotations
 
-import torch
-import torch.nn as nn
 from typing import Optional
 
-from standard_attention import StandardAttention
+import torch
+import torch.nn as nn
+
 from spacetime_feedback import SpacetimeFeedbackBlock
+from standard_attention import StandardAttention
 
 
 class StandardReasoningModel(nn.Module):

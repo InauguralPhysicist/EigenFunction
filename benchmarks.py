@@ -7,10 +7,11 @@ and spacetime feedback should handle better.
 
 from __future__ import annotations
 
+import time
+from typing import Callable
+
 import torch
 import torch.nn as nn
-from typing import Callable
-import time
 
 
 class BenchmarkTask:
@@ -304,7 +305,7 @@ class BenchmarkSuite:
 
 def run_benchmarks():
     """Run benchmarks comparing standard vs spacetime models."""
-    from demo_loop_prevention import StandardReasoningModel, SpacetimeReasoningModel
+    from demo_loop_prevention import SpacetimeReasoningModel, StandardReasoningModel
 
     print("=" * 80)
     print("Loop-Prone Reasoning Benchmarks")
