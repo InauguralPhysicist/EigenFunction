@@ -13,10 +13,7 @@ Tests can run with or without GPU:
 import numpy as np
 import pytest
 import gpu_similarity as gpu_sim
-from similarity import (
-    lorentz_similarity,
-    standard_cosine_similarity
-)
+from similarity import lorentz_similarity, standard_cosine_similarity
 
 
 class TestGPUAvailability:
@@ -55,15 +52,16 @@ class TestGPUCPUConsistency:
             np.array([3.0, 4.0]),
             np.array([1.0, 2.0, 3.0, 4.0, 5.0]),
             np.random.randn(10),
-            np.random.randn(100)
+            np.random.randn(100),
         ]
 
         for v in vectors:
             cpu_sim = lorentz_similarity(v, v)
             gpu_sim_result = gpu_sim.lorentz_similarity_gpu(v, v)
 
-            assert np.isclose(cpu_sim, gpu_sim_result, atol=1e-9), \
-                f"CPU: {cpu_sim}, GPU: {gpu_sim_result}"
+            assert np.isclose(
+                cpu_sim, gpu_sim_result, atol=1e-9
+            ), f"CPU: {cpu_sim}, GPU: {gpu_sim_result}"
 
             # Both should be ~0.0 for self-similarity
             assert np.isclose(gpu_sim_result, 0.0, atol=1e-6)
@@ -81,8 +79,9 @@ class TestGPUCPUConsistency:
             cpu_sim = lorentz_similarity(u, v)
             gpu_sim_result = gpu_sim.lorentz_similarity_gpu(u, v)
 
-            assert np.isclose(cpu_sim, gpu_sim_result, atol=1e-9), \
-                f"Shape {u.shape}: CPU: {cpu_sim}, GPU: {gpu_sim_result}"
+            assert np.isclose(
+                cpu_sim, gpu_sim_result, atol=1e-9
+            ), f"Shape {u.shape}: CPU: {cpu_sim}, GPU: {gpu_sim_result}"
 
     def test_standard_cosine_consistency(self):
         """GPU and CPU standard cosine similarity should match."""
@@ -96,8 +95,9 @@ class TestGPUCPUConsistency:
             cpu_sim = standard_cosine_similarity(u, v)
             gpu_sim_result = gpu_sim.standard_cosine_similarity_gpu(u, v)
 
-            assert np.isclose(cpu_sim, gpu_sim_result, atol=1e-9), \
-                f"CPU: {cpu_sim}, GPU: {gpu_sim_result}"
+            assert np.isclose(
+                cpu_sim, gpu_sim_result, atol=1e-9
+            ), f"CPU: {cpu_sim}, GPU: {gpu_sim_result}"
 
 
 class TestBatchOperations:
@@ -115,8 +115,9 @@ class TestBatchOperations:
         similarities = gpu_sim.lorentz_similarity_batch_gpu(U, V)
 
         assert similarities.shape == (N,)
-        assert np.allclose(similarities, 0.0, atol=1e-6), \
-            f"All self-similarities should be ~0.0, got {similarities[:5]}"
+        assert np.allclose(
+            similarities, 0.0, atol=1e-6
+        ), f"All self-similarities should be ~0.0, got {similarities[:5]}"
 
     def test_batch_consistency_with_loop(self):
         """Batch processing should match individual computations."""
@@ -130,9 +131,7 @@ class TestBatchOperations:
         batch_sims = gpu_sim.lorentz_similarity_batch_gpu(U, V)
 
         # Individual computations
-        individual_sims = np.array([
-            lorentz_similarity(U[i], V[i]) for i in range(N)
-        ])
+        individual_sims = np.array([lorentz_similarity(U[i], V[i]) for i in range(N)])
 
         np.testing.assert_allclose(batch_sims, individual_sims, atol=1e-9)
 
@@ -185,8 +184,7 @@ class TestMatrixOperations:
 
         # Diagonal should be ~0.0 (self-similarity)
         diagonal = np.diag(sim_matrix)
-        assert np.allclose(diagonal, 0.0, atol=1e-6), \
-            f"Diagonal should be ~0.0, got {diagonal[:5]}"
+        assert np.allclose(diagonal, 0.0, atol=1e-6), f"Diagonal should be ~0.0, got {diagonal[:5]}"
 
     def test_matrix_symmetry(self):
         """Self-similarity matrix should be symmetric."""
@@ -233,8 +231,9 @@ class TestMatrixOperations:
             for j in range(M):
                 expected = lorentz_similarity(U[i], V[j])
                 actual = sim_matrix[i, j]
-                assert np.isclose(expected, actual, atol=1e-9), \
-                    f"Mismatch at [{i},{j}]: {expected} vs {actual}"
+                assert np.isclose(
+                    expected, actual, atol=1e-9
+                ), f"Mismatch at [{i},{j}]: {expected} vs {actual}"
 
     def test_matrix_input_validation(self):
         """Test matrix computation input validation."""
@@ -274,19 +273,15 @@ class TestAttentionMechanismSimulation:
         embeddings = np.random.randn(num_tokens, embedding_dim)
 
         # Compute attention scores (queries = keys for self-attention)
-        attention_scores = gpu_sim.lorentz_similarity_matrix_gpu(
-            embeddings, embeddings
-        )
+        attention_scores = gpu_sim.lorentz_similarity_matrix_gpu(embeddings, embeddings)
 
         # Diagonal (self-attention) should be ~0.0
         diagonal = np.diag(attention_scores)
-        assert np.allclose(diagonal, 0.0, atol=1e-6), \
-            "Self-attention should be neutralized"
+        assert np.allclose(diagonal, 0.0, atol=1e-6), "Self-attention should be neutralized"
 
         # Off-diagonal should have meaningful values
         off_diagonal = attention_scores[np.triu_indices(num_tokens, k=1)]
-        assert not np.allclose(off_diagonal, 0.0), \
-            "Cross-attention should have meaningful scores"
+        assert not np.allclose(off_diagonal, 0.0), "Cross-attention should have meaningful scores"
 
     def test_query_key_attention(self):
         """Test query-key attention pattern."""

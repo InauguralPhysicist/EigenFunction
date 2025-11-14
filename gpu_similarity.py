@@ -126,8 +126,8 @@ def _eigen_similarity_2d(
         raise ValueError(f"Dimension mismatch: q has dim {D}, k has dim {D_k}")
 
     # Compute norms
-    norm_q_sq = torch.sum(q ** 2, dim=-1, keepdim=True)  # (B, 1)
-    norm_k_sq = torch.sum(k ** 2, dim=-1, keepdim=True)  # (N, 1)
+    norm_q_sq = torch.sum(q**2, dim=-1, keepdim=True)  # (B, 1)
+    norm_k_sq = torch.sum(k**2, dim=-1, keepdim=True)  # (N, 1)
 
     # Spatial inner products: q · k^T
     spatial_product = torch.mm(q, k.t())  # (B, N)
@@ -148,7 +148,7 @@ def _eigen_similarity_2d(
 
     # Broadcast to (B, N)
     denominator_sq = lorentz_qq_abs.unsqueeze(1) * lorentz_kk_abs.unsqueeze(0)  # (B, N)
-    denominator = torch.sqrt(denominator_sq + epsilon ** 2)
+    denominator = torch.sqrt(denominator_sq + epsilon**2)
 
     # Similarity
     similarity = lorentz_product_qk / denominator.clamp(min=epsilon)
@@ -199,8 +199,8 @@ def _eigen_similarity_3d(
     B = B_q
 
     # Compute norms
-    norm_q_sq = torch.sum(q ** 2, dim=-1, keepdim=True)  # (B, L_q, 1)
-    norm_k_sq = torch.sum(k ** 2, dim=-1, keepdim=True)  # (B, L_k, 1)
+    norm_q_sq = torch.sum(q**2, dim=-1, keepdim=True)  # (B, L_q, 1)
+    norm_k_sq = torch.sum(k**2, dim=-1, keepdim=True)  # (B, L_k, 1)
 
     # Spatial inner products: q @ k^T
     spatial_product = torch.bmm(q, k.transpose(1, 2))  # (B, L_q, L_k)
@@ -221,7 +221,7 @@ def _eigen_similarity_3d(
 
     # Broadcast to (B, L_q, L_k)
     denominator_sq = lorentz_qq_abs.unsqueeze(2) * lorentz_kk_abs.unsqueeze(1)  # (B, L_q, L_k)
-    denominator = torch.sqrt(denominator_sq + epsilon ** 2)
+    denominator = torch.sqrt(denominator_sq + epsilon**2)
 
     # Similarity
     similarity = lorentz_product_qk / denominator.clamp(min=epsilon)
@@ -276,9 +276,7 @@ def standard_cosine_similarity_torch(
         k_norm = F.normalize(k, p=2, dim=-1, eps=epsilon)
         return torch.bmm(q_norm, k_norm.transpose(1, 2))
     else:
-        raise ValueError(
-            f"Unsupported tensor dimensions: q.shape={q.shape}, k.shape={k.shape}"
-        )
+        raise ValueError(f"Unsupported tensor dimensions: q.shape={q.shape}, k.shape={k.shape}")
 
 
 def compare_self_similarity_torch(
@@ -308,7 +306,7 @@ def compare_self_similarity_torch(
         norm = torch.linalg.norm(v.reshape(-1, v.shape[-1]), dim=-1)
 
     return {
-        'standard': standard,
-        'eigen': eigen,
-        'vector_norm': norm,
+        "standard": standard,
+        "eigen": eigen,
+        "vector_norm": norm,
     }

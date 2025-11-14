@@ -45,6 +45,7 @@ import warnings
 # Try to import CuPy for GPU acceleration
 try:
     import cupy as cp
+
     CUPY_AVAILABLE = True
 except ImportError:
     CUPY_AVAILABLE = False
@@ -52,7 +53,7 @@ except ImportError:
     warnings.warn(
         "CuPy not available. GPU functions will fall back to CPU. "
         "Install CuPy with: pip install cupy-cuda11x (or cupy-cuda12x for CUDA 12+)",
-        ImportWarning
+        ImportWarning,
     )
 
 
@@ -95,7 +96,7 @@ def get_array_module(array):
     return np
 
 
-def to_gpu(array: np.ndarray) -> Union[np.ndarray, 'cp.ndarray']:
+def to_gpu(array: np.ndarray) -> Union[np.ndarray, "cp.ndarray"]:
     """
     Transfer numpy array to GPU if available, otherwise return as-is.
 
@@ -114,7 +115,7 @@ def to_gpu(array: np.ndarray) -> Union[np.ndarray, 'cp.ndarray']:
     return np.asarray(array, dtype=np.float64)
 
 
-def to_cpu(array: Union[np.ndarray, 'cp.ndarray']) -> np.ndarray:
+def to_cpu(array: Union[np.ndarray, "cp.ndarray"]) -> np.ndarray:
     """
     Transfer array to CPU (numpy).
 
@@ -134,10 +135,10 @@ def to_cpu(array: Union[np.ndarray, 'cp.ndarray']) -> np.ndarray:
 
 
 def lorentz_similarity_gpu(
-    u: Union[np.ndarray, 'cp.ndarray'],
-    v: Union[np.ndarray, 'cp.ndarray'],
+    u: Union[np.ndarray, "cp.ndarray"],
+    v: Union[np.ndarray, "cp.ndarray"],
     epsilon: float = 1e-10,
-    return_cpu: bool = True
+    return_cpu: bool = True,
 ) -> float:
     """
     Compute Lorentz-invariant cosine similarity on GPU.
@@ -227,11 +228,11 @@ def lorentz_similarity_gpu(
 
 
 def lorentz_similarity_batch_gpu(
-    U: Union[np.ndarray, 'cp.ndarray'],
-    V: Union[np.ndarray, 'cp.ndarray'],
+    U: Union[np.ndarray, "cp.ndarray"],
+    V: Union[np.ndarray, "cp.ndarray"],
     epsilon: float = 1e-10,
-    return_cpu: bool = True
-) -> Union[np.ndarray, 'cp.ndarray']:
+    return_cpu: bool = True,
+) -> Union[np.ndarray, "cp.ndarray"]:
     """
     Compute Lorentz-invariant similarities for batches of vector pairs on GPU.
 
@@ -314,7 +315,9 @@ def lorentz_similarity_batch_gpu(
     final_valid[temp_indices[valid_denom_mask]] = True
 
     # Compute similarities
-    similarities[final_valid] = lorentz_products_uv[final_valid] / xp.sqrt(denominator_squared[final_valid])
+    similarities[final_valid] = lorentz_products_uv[final_valid] / xp.sqrt(
+        denominator_squared[final_valid]
+    )
 
     # Clamp to valid range
     similarities = xp.clip(similarities, -1.0, 1.0)
@@ -326,11 +329,11 @@ def lorentz_similarity_batch_gpu(
 
 
 def lorentz_similarity_matrix_gpu(
-    U: Union[np.ndarray, 'cp.ndarray'],
-    V: Optional[Union[np.ndarray, 'cp.ndarray']] = None,
+    U: Union[np.ndarray, "cp.ndarray"],
+    V: Optional[Union[np.ndarray, "cp.ndarray"]] = None,
     epsilon: float = 1e-10,
-    return_cpu: bool = True
-) -> Union[np.ndarray, 'cp.ndarray']:
+    return_cpu: bool = True,
+) -> Union[np.ndarray, "cp.ndarray"]:
     """
     Compute pairwise Lorentz-invariant similarity matrix on GPU.
 
@@ -408,8 +411,8 @@ def lorentz_similarity_matrix_gpu(
 
     # Self inner products (for normalization)
     # These are all zeros due to lightlike condition, but we compute for consistency
-    lorentz_products_uu = (norms_U ** 2) - (norms_U ** 2)  # shape: (N, 1)
-    lorentz_products_vv = (norms_V ** 2) - (norms_V ** 2)  # shape: (M, 1)
+    lorentz_products_uu = (norms_U**2) - (norms_U**2)  # shape: (N, 1)
+    lorentz_products_vv = (norms_V**2) - (norms_V**2)  # shape: (M, 1)
 
     # Denominators: sqrt(|<u,u>_L| * |<v,v>_L|)
     # Broadcast: (N, 1) * (1, M) -> (N, M)
@@ -445,10 +448,10 @@ def lorentz_similarity_matrix_gpu(
 
 
 def standard_cosine_similarity_gpu(
-    u: Union[np.ndarray, 'cp.ndarray'],
-    v: Union[np.ndarray, 'cp.ndarray'],
+    u: Union[np.ndarray, "cp.ndarray"],
+    v: Union[np.ndarray, "cp.ndarray"],
     epsilon: float = 1e-10,
-    return_cpu: bool = True
+    return_cpu: bool = True,
 ) -> float:
     """
     Compute standard cosine similarity on GPU.
@@ -504,10 +507,7 @@ def standard_cosine_similarity_gpu(
 
 # Convenience function for automatic GPU/CPU selection
 def lorentz_similarity_auto(
-    u: np.ndarray,
-    v: np.ndarray,
-    epsilon: float = 1e-10,
-    prefer_gpu: bool = True
+    u: np.ndarray, v: np.ndarray, epsilon: float = 1e-10, prefer_gpu: bool = True
 ) -> float:
     """
     Automatically select GPU or CPU implementation based on availability.
@@ -533,4 +533,5 @@ def lorentz_similarity_auto(
     else:
         # Fall back to CPU implementation
         from similarity import lorentz_similarity
+
         return lorentz_similarity(u, v, epsilon=epsilon)

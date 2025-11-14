@@ -41,6 +41,7 @@ def check_gpu_status():
         print("✓ GPU (CUDA) is available!")
         try:
             import cupy as cp
+
             device = cp.cuda.Device()
             print(f"  Device: {device}")
             print(f"  Compute Capability: {device.compute_capability}")
@@ -139,9 +140,7 @@ def example_attention_mechanism():
 
     # Compute attention scores using GPU
     start = time.time()
-    attention_scores = gpu_sim.lorentz_similarity_matrix_gpu(
-        embeddings, embeddings
-    )
+    attention_scores = gpu_sim.lorentz_similarity_matrix_gpu(embeddings, embeddings)
     gpu_time = time.time() - start
 
     print(f"GPU attention matrix computation: {gpu_time*1000:.2f} ms")
@@ -151,8 +150,10 @@ def example_attention_mechanism():
     # Analyze self-attention (diagonal)
     diagonal = np.diag(attention_scores)
     print("Self-attention analysis:")
-    print(f"  Diagonal values (self-similarity): mean={np.mean(diagonal):.6f}, "
-          f"std={np.std(diagonal):.6f}")
+    print(
+        f"  Diagonal values (self-similarity): mean={np.mean(diagonal):.6f}, "
+        f"std={np.std(diagonal):.6f}"
+    )
     print(f"  All diagonal ~0.0? {np.allclose(diagonal, 0.0, atol=1e-6)}")
     print()
 
@@ -162,8 +163,10 @@ def example_attention_mechanism():
     off_diagonal = attention_scores[mask]
 
     print("Cross-attention analysis:")
-    print(f"  Off-diagonal values: mean={np.mean(off_diagonal):.6f}, "
-          f"std={np.std(off_diagonal):.6f}")
+    print(
+        f"  Off-diagonal values: mean={np.mean(off_diagonal):.6f}, "
+        f"std={np.std(off_diagonal):.6f}"
+    )
     print(f"  Range: [{np.min(off_diagonal):.3f}, {np.max(off_diagonal):.3f}]")
     print()
 
@@ -203,9 +206,7 @@ def example_semantic_search():
 
     # GPU search
     start = time.time()
-    similarity_matrix = gpu_sim.lorentz_similarity_matrix_gpu(
-        query_embeddings, doc_embeddings
-    )
+    similarity_matrix = gpu_sim.lorentz_similarity_matrix_gpu(query_embeddings, doc_embeddings)
     gpu_time = time.time() - start
 
     print(f"GPU similarity computation: {gpu_time*1000:.2f} ms")
@@ -219,8 +220,9 @@ def example_semantic_search():
     for i in range(min(3, num_queries)):  # Show first 3 queries
         top_k_indices = np.argsort(similarity_matrix[i])[-k:][::-1]
         top_k_scores = similarity_matrix[i][top_k_indices]
-        print(f"  Query {i}: docs {top_k_indices} "
-              f"(scores: {[f'{s:.3f}' for s in top_k_scores]})")
+        print(
+            f"  Query {i}: docs {top_k_indices} " f"(scores: {[f'{s:.3f}' for s in top_k_scores]})"
+        )
 
 
 def example_loop_prevention_demo():
@@ -243,8 +245,10 @@ def example_loop_prevention_demo():
     for i in range(iterations):
         self_sim = standard_cosine_similarity(state, state)
         standard_accumulation += self_sim
-        print(f"  Iteration {i+1}: self-similarity = {self_sim:.6f}, "
-              f"accumulated = {standard_accumulation:.6f}")
+        print(
+            f"  Iteration {i+1}: self-similarity = {self_sim:.6f}, "
+            f"accumulated = {standard_accumulation:.6f}"
+        )
 
     print(f"\n  Total accumulated: {standard_accumulation:.6f}")
     print(f"  Average per iteration: {standard_accumulation/iterations:.6f}")
@@ -257,8 +261,10 @@ def example_loop_prevention_demo():
     for i in range(iterations):
         self_sim = gpu_sim.lorentz_similarity_gpu(state, state)
         lorentz_accumulation += self_sim
-        print(f"  Iteration {i+1}: self-similarity = {self_sim:.6f}, "
-              f"accumulated = {lorentz_accumulation:.6f}")
+        print(
+            f"  Iteration {i+1}: self-similarity = {self_sim:.6f}, "
+            f"accumulated = {lorentz_accumulation:.6f}"
+        )
 
     print(f"\n  Total accumulated: {lorentz_accumulation:.6f}")
     print(f"  Average per iteration: {lorentz_accumulation/iterations:.6f}")
@@ -313,12 +319,15 @@ def performance_comparison():
 
     print("\n" + "-" * 70)
     print("Summary:")
-    print(f"{'Configuration':<20} {'Problem Size':<15} {'GPU (ms)':<12} "
-          f"{'CPU (ms)':<12} {'Speedup':<10}")
+    print(
+        f"{'Configuration':<20} {'Problem Size':<15} {'GPU (ms)':<12} "
+        f"{'CPU (ms)':<12} {'Speedup':<10}"
+    )
     print("-" * 70)
     for label, size, gpu_t, cpu_t, speedup in results:
-        print(f"{label:<20} {size:<15,} {gpu_t*1000:<12.2f} "
-              f"{cpu_t*1000:<12.2f} {speedup:<10.2f}x")
+        print(
+            f"{label:<20} {size:<15,} {gpu_t*1000:<12.2f} " f"{cpu_t*1000:<12.2f} {speedup:<10.2f}x"
+        )
 
 
 def main():

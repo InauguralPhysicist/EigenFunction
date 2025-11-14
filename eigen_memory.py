@@ -152,18 +152,18 @@ class EigenMemory(nn.Module):
 
         # temporal decay: favor recent entries (age=0 newest)
         # effective weight ∝ decay^age  ∈ (0, 1]
-        decay_factor = (self.decay ** age).clamp(min=1e-6)  # (N,)
-        sim = sim + decay_factor.log().unsqueeze(0)         # add log-decay
+        decay_factor = (self.decay**age).clamp(min=1e-6)  # (N,)
+        sim = sim + decay_factor.log().unsqueeze(0)  # add log-decay
 
         # top-k selection
         k = min(self.k_top, N)
-        sim_topk, idx_topk = torch.topk(sim, k, dim=-1)     # (B, k)
+        sim_topk, idx_topk = torch.topk(sim, k, dim=-1)  # (B, k)
 
         # attention weights over top-k
-        attn = F.softmax(sim_topk, dim=-1)                  # (B, k)
+        attn = F.softmax(sim_topk, dim=-1)  # (B, k)
 
         # gather memory vectors
-        mem_topk = mem[idx_topk]                            # (B, k, D)
+        mem_topk = mem[idx_topk]  # (B, k, D)
 
         retrieved = torch.sum(attn.unsqueeze(-1) * mem_topk, dim=1)  # (B, D)
 

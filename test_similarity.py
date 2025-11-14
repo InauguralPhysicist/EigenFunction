@@ -8,11 +8,7 @@ through neutral self-similarity.
 
 import numpy as np
 import pytest
-from similarity import (
-    lorentz_similarity,
-    standard_cosine_similarity,
-    compare_self_similarity
-)
+from similarity import lorentz_similarity, standard_cosine_similarity, compare_self_similarity
 
 
 class TestSelfReferenceProperty:
@@ -24,13 +20,14 @@ class TestSelfReferenceProperty:
             np.array([1.0, 0.0, 0.0]),
             np.array([3.0, 4.0]),
             np.array([1.0, 2.0, 3.0, 4.0, 5.0]),
-            np.random.randn(10)
+            np.random.randn(10),
         ]
 
         for v in vectors:
             sim = standard_cosine_similarity(v, v)
-            assert np.isclose(sim, 1.0, atol=1e-6), \
-                f"Standard cosine self-similarity should be 1.0, got {sim}"
+            assert np.isclose(
+                sim, 1.0, atol=1e-6
+            ), f"Standard cosine self-similarity should be 1.0, got {sim}"
 
     def test_lorentz_self_similarity_is_zero(self):
         """Lorentz-invariant similarity yields 0.0 for self-reference."""
@@ -38,26 +35,27 @@ class TestSelfReferenceProperty:
             np.array([1.0, 0.0, 0.0]),
             np.array([3.0, 4.0]),
             np.array([1.0, 2.0, 3.0, 4.0, 5.0]),
-            np.random.randn(10)
+            np.random.randn(10),
         ]
 
         for v in vectors:
             sim = lorentz_similarity(v, v)
-            assert np.isclose(sim, 0.0, atol=1e-6), \
-                f"Lorentz self-similarity should be 0.0, got {sim}"
+            assert np.isclose(
+                sim, 0.0, atol=1e-6
+            ), f"Lorentz self-similarity should be 0.0, got {sim}"
 
     def test_comparison_function(self):
         """Test the comparison utility function."""
         v = np.array([3.0, 4.0])
         result = compare_self_similarity(v)
 
-        assert 'standard' in result
-        assert 'lorentz' in result
-        assert 'vector_norm' in result
+        assert "standard" in result
+        assert "lorentz" in result
+        assert "vector_norm" in result
 
-        assert np.isclose(result['standard'], 1.0, atol=1e-6)
-        assert np.isclose(result['lorentz'], 0.0, atol=1e-6)
-        assert np.isclose(result['vector_norm'], 5.0, atol=1e-6)
+        assert np.isclose(result["standard"], 1.0, atol=1e-6)
+        assert np.isclose(result["lorentz"], 0.0, atol=1e-6)
+        assert np.isclose(result["vector_norm"], 5.0, atol=1e-6)
 
 
 class TestOrthogonalVectors:
@@ -164,10 +162,12 @@ class TestHighDimensionalVectors:
             standard_sim = standard_cosine_similarity(v, v)
             lorentz_sim = lorentz_similarity(v, v)
 
-            assert np.isclose(standard_sim, 1.0, atol=1e-6), \
-                f"Dim {dim}: standard should be 1.0, got {standard_sim}"
-            assert np.isclose(lorentz_sim, 0.0, atol=1e-6), \
-                f"Dim {dim}: Lorentz should be 0.0, got {lorentz_sim}"
+            assert np.isclose(
+                standard_sim, 1.0, atol=1e-6
+            ), f"Dim {dim}: standard should be 1.0, got {standard_sim}"
+            assert np.isclose(
+                lorentz_sim, 0.0, atol=1e-6
+            ), f"Dim {dim}: Lorentz should be 0.0, got {lorentz_sim}"
 
     def test_random_high_dimensional_pairs(self):
         """Test that different random vectors have non-trivial similarity."""
@@ -206,8 +206,7 @@ class TestLoopPreventionProperty:
 
         # In a naive recursive system, this weight would be multiplied
         # back into the system, creating potential for runaway feedback
-        assert standard_weight == 1.0, \
-            "Standard self-weight is 1.0 - maximum reinforcement"
+        assert standard_weight == 1.0, "Standard self-weight is 1.0 - maximum reinforcement"
 
     def test_iterative_self_reinforcement_lorentz(self):
         """
@@ -223,8 +222,7 @@ class TestLoopPreventionProperty:
 
         # The neutral weight means self-reference contributes nothing,
         # forcing the system to incorporate external information
-        assert lorentz_weight == 0.0, \
-            "Lorentz self-weight is 0.0 - neutral, non-reinforcing"
+        assert lorentz_weight == 0.0, "Lorentz self-weight is 0.0 - neutral, non-reinforcing"
 
     def test_recursive_accumulation_simulation(self):
         """
@@ -237,14 +235,10 @@ class TestLoopPreventionProperty:
         iterations = 10
 
         # Standard cosine: accumulates self-similarity
-        standard_accumulation = sum(
-            standard_cosine_similarity(v, v) for _ in range(iterations)
-        )
+        standard_accumulation = sum(standard_cosine_similarity(v, v) for _ in range(iterations))
 
         # Lorentz: self-similarity doesn't accumulate
-        lorentz_accumulation = sum(
-            lorentz_similarity(v, v) for _ in range(iterations)
-        )
+        lorentz_accumulation = sum(lorentz_similarity(v, v) for _ in range(iterations))
 
         # Standard grows linearly with iterations
         assert np.isclose(standard_accumulation, iterations, atol=1e-6)
